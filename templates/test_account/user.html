@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block title %}User Interface{% endblock %}
+
+{% block content %}
+    {% if username %}
+    <h3>Welcome, {{username}}!</h3>
+    {% endif %}
+{% endblock %}

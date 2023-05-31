@@ -1,8 +1,12 @@
+{% include 'base.html' %}
 <html>
   <head>
-    <title>Company List</title>
+    <title>CP List</title>
   </head>
   <body>
+    <h5>
+      Corporate Partner List for AY 2022-23
+    </h5>
     <ul>
       {% for project in payload1 %}
       <li>{{ project['company'] }}</li>

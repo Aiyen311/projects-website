@@ -1,3 +1,4 @@
+{% include 'base.html' %}
 <html>
   <head>
     <title>HOME</title>
@@ -32,7 +33,7 @@
         </div>
                 <div class="card-footer">
                     <div class="row">
-                        <small class="text-muted col-sm-6 text-start">AY {{ project['year'] }} - {{ project['year'] }}</small>
+                        <small class="text-muted col-sm-6 text-start">AY {{ project['year'] }} - {{ project['year'] | int + 1 }}</small>
                   <!-- <small class="text-muted col-sm-6 text-end">Last updated: {{ project.updated_at }}</small> -->
                     </div>
                 </div>

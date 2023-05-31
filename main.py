@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Form
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
 from fastapi.requests import Request
 from dotenv import load_dotenv
 import psycopg2
@@ -11,6 +12,11 @@ from pydantic import BaseModel
 
 app = FastAPI()
 templates = Jinja2Templates(directory='templates/')
+
+admin_credentials = {
+    "username": "admin",
+    "password": "password123"
+}
 
 class Company(BaseModel):
     name: str
@@ -68,3 +74,14 @@ async def get_companies(request: Request):
 
     response = templates.TemplateResponse("test_templates/list.html", {"request": request, "payload1": projects}) 
     return response
+
+@app.get("/admin", response_class=HTMLResponse)
+def admin_interface(request: Request):
+    return templates.TemplateResponse("test_account/admin.html", {"request": request})
+
+@app.post("/login")
+async def login(request: Request, username: str = Form(...), password: str = Form(...)):
+    if username == admin_credentials["username"] and password == admin_credentials["password"]:
+        return templates.TemplateResponse("test_account/user.html", {"request": request, "username": username})
+    else:
+        return templates.TemplateResponse("test_account/admin.html", {"request": request, "error": "Invalid credentials"})
