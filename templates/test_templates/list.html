@@ -1,0 +1,12 @@
+<html>
+  <head>
+    <title>Company List</title>
+  </head>
+  <body>
+    <ul>
+      {% for project in payload1 %}
+      <li>{{ project['company'] }}</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>

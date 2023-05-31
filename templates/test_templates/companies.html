@@ -1,12 +1,44 @@
 <html>
   <head>
     <title>HOME</title>
+    {% block css %}
+    <!-- Latest compiled and minified Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" integrity="sha512-GQGU0fMMi238uA+a/bdWJfpUGKUkBdgfFdgBm72SUQ6BeyWjoY/ton0tEjH+OSH9iP4Dfh+7HM0I9f5eR0L/4w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  {% endblock %}
   </head>
   <body>
-    <ul>
-      {% for company in payload1 %}
-      <li>{{ company }}</li>
-      {% endfor %}
-    </ul>
+    <style>
+      h3 {text-align: center;}
+    </style>
+    <h3 id="project-title">2023-2024 Corporate Partners Projects</h3>
+    {% for project in payload1 %}
+    <div class="row justify-content-center">
+      <div class="col-6">
+      <div class="card mb-3">
+        <div class="card-body">
+          <a href="{{ project.get_absolute_url }}" class="text-decoration-none"><h5 class="card-title">{{ project['company'] }} - {{ project['title'] }}</h5></a>
+        </div>
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item"><b>Lecture time:</b> {{ project['lecturetimes'] }}</li>
+          <li class="list-group-item"><b>Lab time:</b> {{ project['labtimes'] }}</li>
+          <li class="list-group-item"><b>Domain:</b> {{ project['domain'] }}</li>
+          <li class="list-group-item"><b>Keywords:</b> {{ project['keywords'] }}</li>
+          <li class="list-group-item"><b>Tools:</b> {{ project['tools'] }}</li>
+          <li class="list-group-item"><b>Citizenship:</b> {{ project['citizenship_status'] }}</li>
+          </ul>
+        <div class="card-body">
+          <h6 class="card-text">Summary</h6>
+          <p class="card-text">{{ project['summary'] }}</p>
+        </div>
+                <div class="card-footer">
+                    <div class="row">
+                        <small class="text-muted col-sm-6 text-start">AY {{ project['year'] }} - {{ project['year'] }}</small>
+                  <!-- <small class="text-muted col-sm-6 text-end">Last updated: {{ project.updated_at }}</small> -->
+                    </div>
+                </div>
+      </div>
+      </div>
+    </div>
+	{% endfor %}
   </body>
 </html>
