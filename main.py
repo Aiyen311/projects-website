@@ -1,12 +1,14 @@
-from fastapi import FastAPI, Request, Form
+from fastapi import FastAPI, Request, Form, Depends
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from fastapi.requests import Request
 from dotenv import load_dotenv
+from typing import List
 import psycopg2
 import aiosql
 import os
 import csv
+from model import Project, Projects
 from pydantic import BaseModel
 
 
@@ -18,21 +20,17 @@ admin_credentials = {
     "password": "password123"
 }
 
-class Company(BaseModel):
-    name: str
-    address: str
-
-def read_csv(file_path):
-    with open(file_path, 'r') as csv_file:
-        reader = csv.DictReader(csv_file)
-        data = list(reader)
-    return data    
-
-def get_projects():
-    file_path = "sample_data/projects.csv"  
-    data = read_csv(file_path)
-    companies = [v for v in data]
-    return companies
+# new code
+def parse_csv():
+    file_path = "sample_data/projects.csv" 
+    models = [] 
+    with open(file_path, 'r') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            model = Project(**row)
+            models.append(model)
+            
+    return models
 
 # @app.get("/hello/{name}")
 # async def root(request: Request, name: str):
@@ -48,12 +46,7 @@ def get_projects():
 
 @app.get("/companies")
 async def get_companies(request: Request):
-    projects = get_projects()
-    load_dotenv()
-
-    # conn = psycopg2.connect(f"dbname=tdm_main user=iyengar1 password=FOLD-gumption-aqualung-slurry-weary host=lpvtdmdb01.itap.purdue.edu")
-    # queries = aiosql.from_path("queries.sql", "psycopg2")
-
+    projects = parse_csv()
     accept = request.headers.get("accept")
 
     if accept.split("/")[1] == 'json':
@@ -63,16 +56,29 @@ async def get_companies(request: Request):
         response = templates.TemplateResponse("test_templates/companies.html", {"request": request, "payload1": projects}) 
         return response
 
-@app.get("/home")
+@app.get("/")
 async def get_index(request: Request):
     response = templates.TemplateResponse("base.html", {"request": request}) 
     return response
 
 @app.get("/list")
 async def get_companies(request: Request):
-    projects = get_projects()
+    load_dotenv()
+    conn = psycopg2.connect(f"dbname={os.getenv('DB_NAME')} user={os.getenv('DB_USER')} password={os.getenv('DB_PASSWORD')} host={os.getenv('DB_HOST')}")
+    queries = aiosql.from_path("queries.sql", "psycopg2")
 
-    response = templates.TemplateResponse("test_templates/list.html", {"request": request, "payload1": projects}) 
+    proj = sorted([v for v in queries.get_all_projects(conn)], key=lambda x: x[1], reverse=True)
+    years_dict = dict()
+    years_dict[2023] = ['TestA', 'TestB']
+    for line in proj:
+        if line[1] in years_dict:
+            # append the new number to the existing array at this slot
+            years_dict[int(line[1])].append(line[0])
+        else:
+            # create a new array in this slot
+            years_dict[int(line[1])] = [line[0]]
+    print(years_dict)
+    response = templates.TemplateResponse("test_templates/list.html", {"request": request, "payload1": years_dict}) 
     return response
 
 @app.get("/admin", response_class=HTMLResponse)

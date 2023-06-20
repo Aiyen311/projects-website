@@ -5,12 +5,15 @@
   </head>
   <body>
     <h5>
-      Corporate Partner List for AY 2022-23
+      Corporate Partner Project List for AY 2023-24
     </h5>
-    <ul>
-      {% for project in payload1 %}
-      <li>{{ project['company'] }}</li>
+    {% for year in payload1 %}
+      <div>{{ year }}</div>
+      {% for project in payload1[year] %}
+        <ul>
+          <li><a href="{{ project[0].get_absolute_url }}?year={{ year }}">{{ project }}</a></li>
+        </ul>
       {% endfor %}
-    </ul>
-  </body>
+    {% endfor %}
+  </body> 
 </html>

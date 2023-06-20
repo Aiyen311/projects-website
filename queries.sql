@@ -1,3 +1,3 @@
--- name: get-all-companies
+-- name: get-all-projects
 -- Get a list of all of the companies.
-SELECT company_name FROM companies;
+SELECT title, EXTRACT(YEAR FROM created_at) FROM projects;
