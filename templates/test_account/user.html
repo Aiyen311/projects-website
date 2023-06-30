@@ -4,6 +4,8 @@
 
 {% block content %}
     {% if username %}
-    <h3>Welcome, {{username}}!</h3>
+        <h3>Welcome, {{username}}!</h3>
+        <a href="/dashboard">Go to Dashboard</a><br>
+        <a href="/logout">Logout</a>
     {% endif %}
 {% endblock %}

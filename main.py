@@ -15,12 +15,16 @@ from pydantic import BaseModel
 app = FastAPI()
 templates = Jinja2Templates(directory='templates/')
 
-admin_credentials = {
-    "username": "admin",
-    "password": "password123"
+# hard coded this for testing purpose
+users = {
+    "admin": {"password": "adminpass", "is_admin": True},
+    "user": {"password": "userpass", "is_admin": False},
 }
 
-# new code
+# A global variable to track the current logged-in user
+current_user = None
+
+# new code to parse csv file and add into model
 def parse_csv():
     file_path = "sample_data/projects.csv" 
     models = [] 
@@ -31,18 +35,6 @@ def parse_csv():
             models.append(model)
             
     return models
-
-# @app.get("/hello/{name}")
-# async def root(request: Request, name: str):
-#     accept = request.headers.get("accept")
-#     hello_world = {"message": f"hello {name}"}
-
-#     if accept.split("/")[1] == 'json':
-#         return hello_world
-
-#     if len(accept.split(",")) > 1 or accept.split("/")[1] == 'html':
-#         response = templates.TemplateResponse("index.html", {"request": request, "payload1": hello_world}) 
-#         return response
 
 @app.get("/companies")
 async def get_companies(request: Request):
@@ -58,7 +50,8 @@ async def get_companies(request: Request):
 
 @app.get("/")
 async def get_index(request: Request):
-    response = templates.TemplateResponse("base.html", {"request": request}) 
+    global current_user
+    response = templates.TemplateResponse("base.html", {"request": request, "username": current_user}) 
     return response
 
 @app.get("/list")
@@ -81,13 +74,30 @@ async def get_companies(request: Request):
     response = templates.TemplateResponse("test_templates/list.html", {"request": request, "payload1": years_dict}) 
     return response
 
-@app.get("/admin", response_class=HTMLResponse)
+@app.get("/login", response_class=HTMLResponse)
 def admin_interface(request: Request):
-    return templates.TemplateResponse("test_account/admin.html", {"request": request})
+    return templates.TemplateResponse("test_account/login.html", {"request": request})
 
 @app.post("/login")
 async def login(request: Request, username: str = Form(...), password: str = Form(...)):
-    if username == admin_credentials["username"] and password == admin_credentials["password"]:
+    global current_user
+
+    if username in users and users[username]["password"] == password:
+        current_user = username
         return templates.TemplateResponse("test_account/user.html", {"request": request, "username": username})
     else:
-        return templates.TemplateResponse("test_account/admin.html", {"request": request, "error": "Invalid credentials"})
+        return templates.TemplateResponse("test_account/login.html", {"request": request, "error": "Invalid username or password."})
+    
+@app.get("/logout")
+def logout(request: Request):
+    global current_user
+    current_user = None
+    return templates.TemplateResponse("test_account/login.html", {"request": request})
+
+
+@app.get("/dashboard")
+def dashboard(request: Request):
+    if current_user and users[current_user]["is_admin"]:
+        return templates.TemplateResponse("test_account/dashboard.html", {"request": request, "username": current_user})
+    else:
+        return templates.TemplateResponse("test_account/unauthorized.html", {"request": request})

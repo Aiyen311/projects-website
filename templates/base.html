@@ -25,10 +25,10 @@
             <a class="nav-link" href="http://127.0.0.1:8000/list">Project List</a>
           </li>
           <li class="nav-item">
-            {% if user_signed_in %}
-              <a class="nav-link" href="http://127.0.0.1:8000/admin">Sign out</a>
+            {% if username %}
+              <a class="nav-link" href="http://127.0.0.1:8000/logout">Logout</a>          
             {% else %}
-              <a class="nav-link" href="http://127.0.0.1:8000/admin">Login</a>
+              <a class="nav-link" href="http://127.0.0.1:8000/login">Login</a>
             {% endif %}
           </li>
           <!-- Add more menu items as needed -->
